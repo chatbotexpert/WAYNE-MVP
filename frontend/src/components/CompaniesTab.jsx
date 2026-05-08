@@ -141,7 +141,7 @@ export default function CompaniesTab() {
         </div>
 
         <div className="mt-8 flex justify-end border-t border-slate-200 pt-6">
-          <button type="submit" className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-slate-900 font-medium rounded-lg transition-colors">
+          <button type="submit" className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
             Add Company
           </button>
         </div>

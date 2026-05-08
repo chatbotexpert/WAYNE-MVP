@@ -1,5 +1,5 @@
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -17,6 +17,7 @@ model User {
   role             String
   company_id       String?
   company          Company?  @relation(fields: [company_id], references: [id])
+  permission_flags PermissionFlags?
   created_at       DateTime @default(now())
 
   workforce_assignments WorkforceAssignment[]
@@ -44,6 +45,7 @@ model Company {
   max_sup                 Int      @default(0)
   max_departments         Int      @default(0)
   main_contact            String?
+  deleted_at          DateTime?
   created_at              DateTime @default(now())
 
   users      User[]
@@ -78,6 +80,9 @@ model Workforce {
   training_manager_id   String?
   training_manager      User?    @relation("ManagerWorkforce", fields: [training_manager_id], references: [id])
 
+  deleted_at          DateTime?
+  consent_date        DateTime?
+  privacy_policy_version String?
   created_at            DateTime @default(now())
 
   assignments           WorkforceAssignment[]
@@ -212,4 +217,29 @@ model NvqMetric {
   certification_date               DateTime?
   
   created_at                       DateTime  @default(now())
+}
+model AuditLog {
+  id             String   @id @default(uuid())
+  user_id        String
+  action         String   // e.g., 'CREATE', 'UPDATE', 'DELETE', 'EXPORT'
+  target_entity  String   // e.g., 'Workforce', 'Company'
+  target_id      String?
+  timestamp      DateTime @default(now())
+  ip_address     String?
+  details        String?  // JSON stringified details
+}
+
+
+model PermissionFlags {
+  id                String   @id @default(uuid())
+  user_id           String   @unique
+  user              User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  
+  can_manage_users  Boolean  @default(false)
+  can_manage_billing Boolean  @default(false)
+  can_export_data   Boolean  @default(false)
+  can_delete_records Boolean @default(false)
+  can_manage_permissions Boolean @default(false)
+  
+  created_at        DateTime @default(now())
 }

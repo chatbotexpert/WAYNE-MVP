@@ -24,7 +24,9 @@ export default function WorkforcesTab() {
     in_house_cert_number: '',
     company_id: '',
     supervisor_id: '',
-    training_manager_id: ''
+    training_manager_id: '',
+    consent_date: '',
+    privacy_policy_version: 'v1.0'
   });
 
   const [workforces, setWorkforces] = useState([]);
@@ -33,7 +35,8 @@ export default function WorkforcesTab() {
 
   useEffect(() => {
     fetchWorkforces();
-    if (user.role === 'Admin') {
+    const hasWriteAccess = ['Admin', 'Super_Admin', 'Training manager', 'Training Manager'].includes(user.role);
+    if (hasWriteAccess) {
       api.get('/companies').then(res => setCompanies(res.data));
     }
   }, [user.role]);
@@ -64,7 +67,7 @@ export default function WorkforcesTab() {
         name: '', department: '', candidate_address: '', email: '', contact_number: '',
         date_of_birth: '', ni_number: '', cscs_expiry: '', swqr_expiry: '', eusr_expiry: '',
         cscs_number: '', swqr_number: '', eusr_number: '', npors_number: '', in_house_cert_number: '',
-        company_id: '', supervisor_id: '', training_manager_id: ''
+        company_id: '', supervisor_id: '', training_manager_id: '', consent_date: '', privacy_policy_version: 'v1.0'
       });
       fetchWorkforces();
     } catch (err) {
@@ -73,13 +76,29 @@ export default function WorkforcesTab() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this candidate?")) return;
+    if (!window.confirm("Are you sure you want to soft delete this candidate? (Anonymizes data and removes from active views)")) return;
     try {
       await api.delete(`/workforce/${id}`);
       fetchWorkforces();
     } catch (err) {
       console.error(err);
       alert("Failed to delete workforce.");
+    }
+  };
+
+  const handleExportSAR = async (id, name) => {
+    try {
+      const res = await api.get(`/workforce/${id}/export`);
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(res.data.data, null, 2));
+      const downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute("href", dataStr);
+      downloadAnchorNode.setAttribute("download", `SAR_Export_${name.replace(/\s+/g, '_')}.json`);
+      document.body.appendChild(downloadAnchorNode);
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to export SAR data.");
     }
   };
 
@@ -90,7 +109,7 @@ export default function WorkforcesTab() {
     <div className="pb-10">
       <h2 className="text-2xl font-bold text-slate-900 mb-6">Manage Workforce</h2>
 
-      {user.role === 'Admin' && (
+      {['Admin', 'Super_Admin', 'Training manager', 'Training Manager'].includes(user.role) && (
         <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl border border-slate-200 mb-8 max-w-5xl">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             
@@ -151,6 +170,16 @@ export default function WorkforcesTab() {
                   {supervisors.map(sup => <option key={sup.id} value={sup.id}>{sup.name}</option>)}
                 </select>
               </div>
+              <div className="col-span-1 md:col-span-2 grid grid-cols-2 gap-4 bg-blue-50/50 p-4 rounded-lg border border-blue-100 mt-2">
+                <div>
+                  <label className="block text-xs font-bold mb-1 text-blue-900">GDPR Consent Date *</label>
+                  <input required type="date" name="consent_date" value={formData.consent_date} onChange={handleChange} className="w-full bg-white border border-blue-200 rounded-lg px-2 py-2 text-slate-900 text-xs outline-none" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold mb-1 text-blue-900">Privacy Policy Version</label>
+                  <input type="text" name="privacy_policy_version" value={formData.privacy_policy_version} onChange={handleChange} className="w-full bg-white border border-blue-200 rounded-lg px-2 py-2 text-slate-900 text-xs outline-none" />
+                </div>
+              </div>
             </div>
 
             {/* Certifications */}
@@ -194,7 +223,7 @@ export default function WorkforcesTab() {
           </div>
 
           <div className="mt-8 flex justify-end border-t border-slate-200 pt-6">
-            <button type="submit" className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-slate-900 font-medium rounded-lg transition-colors">
+            <button type="submit" className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
               Add Workforce
             </button>
           </div>
@@ -214,6 +243,7 @@ export default function WorkforcesTab() {
               <th className="px-6 py-3 font-medium">Supervisor</th>
               <th className="px-6 py-3 font-medium">DOB</th>
               <th className="px-6 py-3 font-medium">NI No</th>
+              <th className="px-6 py-3 font-medium">Consent Date</th>
               <th className="px-6 py-3 font-medium">Contact No</th>
               <th className="px-6 py-3 font-medium">Email</th>
               <th className="px-6 py-3 font-medium">Address</th>
@@ -222,7 +252,7 @@ export default function WorkforcesTab() {
               <th className="px-6 py-3 font-medium">EUSR (No / Exp)</th>
               <th className="px-6 py-3 font-medium">NPORS</th>
               <th className="px-6 py-3 font-medium">In-House Cert</th>
-              {user.role === 'Admin' && <th className="px-6 py-3 font-medium text-right">Actions</th>}
+              {['Admin', 'Super_Admin', 'Training manager', 'Training Manager'].includes(user.role) && <th className="px-6 py-3 font-medium text-right">Actions</th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
@@ -236,7 +266,8 @@ export default function WorkforcesTab() {
                 <td className="px-6 py-4 text-slate-600">{w.training_manager?.name || '-'}</td>
                 <td className="px-6 py-4 text-slate-600">{w.supervisor?.name || '-'}</td>
                 <td className="px-6 py-4 text-slate-600">{w.date_of_birth ? new Date(w.date_of_birth).toLocaleDateString() : '-'}</td>
-                <td className="px-6 py-4 text-slate-600">{w.ni_number || '-'}</td>
+                <td className="px-6 py-4 text-slate-600 font-mono text-xs">{w.ni_number || '-'}</td>
+                <td className="px-6 py-4 text-slate-600 text-xs">{w.consent_date ? new Date(w.consent_date).toLocaleDateString() : 'Missing'}</td>
                 <td className="px-6 py-4 text-slate-600">{w.contact_number || '-'}</td>
                 <td className="px-6 py-4 text-slate-600">{w.email || '-'}</td>
                 <td className="px-6 py-4 text-slate-600">{w.candidate_address || '-'}</td>
@@ -253,9 +284,12 @@ export default function WorkforcesTab() {
                 <td className="px-6 py-4 text-slate-600">{w.npors_number || '-'}</td>
                 <td className="px-6 py-4 text-slate-600">{w.in_house_cert_number || '-'}</td>
                 
-                {user.role === 'Admin' && (
-                  <td className="px-6 py-4 text-right">
-                    <button onClick={() => handleDelete(w.id)} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 p-2 rounded-lg transition-colors">
+                {['Admin', 'Super_Admin', 'Training manager', 'Training Manager'].includes(user.role) && (
+                  <td className="px-6 py-4 text-right flex items-center justify-end space-x-2">
+                    <button onClick={() => handleExportSAR(w.id, w.name)} title="Export SAR JSON" className="text-blue-500 hover:text-blue-600 hover:bg-blue-50 p-2 rounded-lg transition-colors">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => handleDelete(w.id)} title="Soft Delete" className="text-red-400 hover:text-red-300 hover:bg-red-50 p-2 rounded-lg transition-colors">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </td>

@@ -1,25 +1,31 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { LogOut, Users, Building2, Briefcase, BarChart3, Activity } from 'lucide-react';
+import { LogOut, Users, Building2, Briefcase, BarChart3, Activity, ShieldCheck } from 'lucide-react';
 import { NavLink, Outlet } from 'react-router-dom';
 
 export default function DashboardLayout() {
   const { user, logout } = useAuth();
 
-  const navItems = user.role === 'Admin' 
-    ? [
-        { name: 'Companies', path: '/dashboard/companies', icon: Building2 },
-        { name: 'Employees', path: '/dashboard/employees', icon: Users },
-        { name: 'Workforces', path: '/dashboard/workforces', icon: Briefcase },
-        { name: 'NPORS', path: '/dashboard/npors', icon: Activity },
-        { name: 'NRSWA', path: '/dashboard/nrswa', icon: Activity },
-        { name: 'EUSR', path: '/dashboard/eusr', icon: Activity },
-        { name: 'In-House', path: '/dashboard/inhouse', icon: Activity },
-        { name: 'NVQ', path: '/dashboard/nvq', icon: Activity },
-      ]
-    : [
-        { name: 'Workforces', path: '/dashboard/workforces', icon: Briefcase },
-      ];
+  let navItems = [];
+  const hasWriteAccess = ['Admin', 'Super_Admin', 'Training manager', 'Training Manager'].includes(user.role);
+  
+  if (hasWriteAccess) {
+    navItems = [
+      { name: 'Companies', path: '/dashboard/companies', icon: Building2 },
+      { name: 'Employees', path: '/dashboard/employees', icon: Users },
+      { name: 'Workforces', path: '/dashboard/workforces', icon: Briefcase },
+      { name: 'NPORS', path: '/dashboard/npors', icon: Activity },
+      { name: 'NRSWA', path: '/dashboard/nrswa', icon: Activity },
+      { name: 'EUSR', path: '/dashboard/eusr', icon: Activity },
+      { name: 'In-House', path: '/dashboard/inhouse', icon: Activity },
+      { name: 'NVQ', path: '/dashboard/nvq', icon: Activity },
+    ];
+  } else {
+    navItems = [
+      { name: 'Training Matrix', path: '/dashboard/matrix', icon: BarChart3 },
+      { name: 'Workforces', path: '/dashboard/workforces', icon: Briefcase },
+    ];
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 flex text-slate-500">

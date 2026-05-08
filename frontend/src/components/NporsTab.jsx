@@ -2,6 +2,82 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { FileText, Trash2, Calendar, Building2, HardHat } from 'lucide-react';
+import Select from 'react-select';
+
+const nporsCategoryOptions = [
+  { value: "N241 Pay Welder", label: "N241 Pay Welder" },
+  { value: "N601 Agricultural Tractor", label: "N601 Agricultural Tractor" },
+  { value: "N726 Quick Hitch Awareness", label: "N726 Quick Hitch Awareness" },
+  { value: "N214 Road Roller", label: "N214 Road Roller" },
+  { value: "N216 Road Planer", label: "N216 Road Planer" },
+  { value: "N217 Road Sweeper", label: "N217 Road Sweeper" },
+  { value: "N220 Paver", label: "N220 Paver" },
+  { value: "N244 Chipper", label: "N244 Chipper" },
+  { value: "N609 Winching & Recovery", label: "N609 Winching & Recovery" },
+  { value: "N802 Gritter/Snowplough", label: "N802 Gritter/Snowplough" },
+  { value: "N027 Excavation Marshal - Banksperson", label: "N027 Excavation Marshal - Banksperson" },
+  { value: "N029 Refuse Collection Vehicle", label: "N029 Refuse Collection Vehicle" },
+  { value: "N120 Plant Loader & Securer", label: "N120 Plant Loader & Securer" },
+  { value: "N210 Tow Tractor", label: "N210 Tow Tractor" },
+  { value: "N219 Skip Loader", label: "N219 Skip Loader" },
+  { value: "N225 Multi Lift & Drop - Hook Loader Vehicle", label: "N225 Multi Lift & Drop - Hook Loader Vehicle" },
+  { value: "N243 Shunter Vehicle", label: "N243 Shunter Vehicle" },
+  { value: "N607 4 x 4 Off Road Vehicle", label: "N607 4 x 4 Off Road Vehicle" },
+  { value: "N608 All-Terrain Vehicle", label: "N608 All-Terrain Vehicle" },
+  { value: "N045 Safe Use of Mobile Loading Ramps", label: "N045 Safe Use of Mobile Loading Ramps" },
+  { value: "N017 Abrasive Wheels - Hand Held Cut off Saw", label: "N017 Abrasive Wheels - Hand Held Cut off Saw" },
+  { value: "N025 Concrete Cutting Chainsaw", label: "N025 Concrete Cutting Chainsaw" },
+  { value: "N301A Abrasive Wheels Awareness", label: "N301A Abrasive Wheels Awareness" },
+  { value: "N301 Abrasive Wheels with Practical Cutting/Grinding", label: "N301 Abrasive Wheels with Practical Cutting/Grinding" },
+  { value: "N302 Bench Saw", label: "N302 Bench Saw" },
+  { value: "N303 Circular Saw", label: "N303 Circular Saw" },
+  { value: "N304 Cable Avoidance Tool", label: "N304 Cable Avoidance Tool" },
+  { value: "N602 Chainsaw - Maintenance and Cross Cutting", label: "N602 Chainsaw - Maintenance and Cross Cutting" },
+  { value: "N603 Wood Chipper/Shredder", label: "N603 Wood Chipper/Shredder" },
+  { value: "N604 Grass Cutters/Mowers", label: "N604 Grass Cutters/Mowers" },
+  { value: "N605 Strimmer/Brushcutter", label: "N605 Strimmer/Brushcutter" },
+  { value: "N606 Stump Grinder", label: "N606 Stump Grinder" },
+  { value: "N610 Hand Held Hedge Trimmer", label: "N610 Hand Held Hedge Trimmer" },
+  { value: "N710 Cartridge Tools", label: "N710 Cartridge Tools" },
+  { value: "N048 Powered Handheld Breaker", label: "N048 Powered Handheld Breaker" },
+  { value: "N033 Puller winch", label: "N033 Puller winch" },
+  { value: "N038 High Pressure Water Jetting", label: "N038 High Pressure Water Jetting" },
+  { value: "N049 Shoring (Install, Inspect, Remove)", label: "N049 Shoring (Install, Inspect, Remove)" },
+  { value: "N050 3D GPS Machine Control System", label: "N050 3D GPS Machine Control System" },
+  { value: "N015 Soil Displacement Hammer", label: "N015 Soil Displacement Hammer" },
+  { value: "N022 Piling Rig Attendant", label: "N022 Piling Rig Attendant" },
+  { value: "N026 Roll Crusher - Packer", label: "N026 Roll Crusher - Packer" },
+  { value: "N130 Horizontal Directional Drilling Rig", label: "N130 Horizontal Directional Drilling Rig" },
+  { value: "N207 Crusher", label: "N207 Crusher" },
+  { value: "N208 Screener", label: "N208 Screener" },
+  { value: "N211 Concrete Pump (Mobile)", label: "N211 Concrete Pump (Mobile)" },
+  { value: "N221 Piling Rig", label: "N221 Piling Rig" },
+  { value: "N721 Static Concrete Placing Boom", label: "N721 Static Concrete Placing Boom" },
+  { value: "N040 Soil Stabiliser", label: "N040 Soil Stabiliser" },
+  { value: "N041 Post Rammer", label: "N041 Post Rammer" },
+  { value: "N031 Asbestos Awareness", label: "N031 Asbestos Awareness" },
+  { value: "N034 Plant Supervisor Awareness", label: "N034 Plant Supervisor Awareness" },
+  { value: "N035 MEWP Supervisor Awareness", label: "N035 MEWP Supervisor Awareness" },
+  { value: "N036 FLT Supervisor Awareness", label: "N036 FLT Supervisor Awareness" },
+  { value: "N132 Plant Mover - Non Operational Duties", label: "N132 Plant Mover - Non Operational Duties" },
+  { value: "N133 Plant Machinery Marshal", label: "N133 Plant Machinery Marshal" },
+  { value: "N403 Vehicle Marshal", label: "N403 Vehicle Marshal" },
+  { value: "N404 Safe Working at Height", label: "N404 Safe Working at Height" },
+  { value: "N702A Confined Spaces-Low Risk", label: "N702A Confined Spaces-Low Risk" },
+  { value: "N702B Confined Spaces-Medium Risk", label: "N702B Confined Spaces-Medium Risk" },
+  { value: "N702C Confined Spaces-High Risk", label: "N702C Confined Spaces-High Risk" },
+  { value: "N703 Fire Warden", label: "N703 Fire Warden" },
+  { value: "N704 Manual Handling", label: "N704 Manual Handling" },
+  { value: "N711 Safe Use of Ladders and Ladders", label: "N711 Safe Use of Ladders and Ladders" },
+  { value: "N714 Safety at Street and Road Works", label: "N714 Safety at Street and Road Works" },
+  { value: "N723 Harness and Fall Arrest", label: "N723 Harness and Fall Arrest" },
+  { value: "S030 Port Safety Passport", label: "S030 Port Safety Passport" },
+  { value: "S001 Site Safety Awareness", label: "S001 Site Safety Awareness" },
+  { value: "S029 Construction Site Safety Supervisor", label: "S029 Construction Site Safety Supervisor" },
+  { value: "S031 Construction Site Safety Manager", label: "S031 Construction Site Safety Manager" },
+  { value: "S032 Construction Site Safety Manager - Refresher", label: "S032 Construction Site Safety Manager - Refresher" },
+  { value: "S033 Construction Site Safety Supervisor - Refresher", label: "S033 Construction Site Safety Supervisor - Refresher" }
+];
 
 export default function NporsTab() {
   const { user } = useAuth();
@@ -45,7 +121,8 @@ export default function NporsTab() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (user.role === 'Supervisor') return;
+    const hasWriteAccess = ['Admin', 'Super_Admin', 'Training manager', 'Training Manager'].includes(user.role);
+    if (!hasWriteAccess) return;
     try {
       await api.post('/npors', formData);
       setFormData({
@@ -76,7 +153,7 @@ export default function NporsTab() {
     <div className="pb-10">
       <h2 className="text-2xl font-bold text-slate-900 mb-6">NPORS Tracker</h2>
 
-      {user.role !== 'Supervisor' && (
+      {['Admin', 'Super_Admin', 'Training manager', 'Training Manager'].includes(user.role) && (
         <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl border border-slate-200 mb-8 max-w-5xl">
           
           <div className="mb-8 p-4 bg-slate-50 border border-slate-200 rounded-lg">
@@ -116,7 +193,27 @@ export default function NporsTab() {
               </div>
               <div>
                 <label className="block text-xs font-medium mb-1 text-slate-600">NPORS Category</label>
-                <input type="text" name="category" value={formData.category} onChange={handleChange} placeholder="e.g. Excavator" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-900 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
+                <Select
+                  options={nporsCategoryOptions}
+                  value={nporsCategoryOptions.find(c => c.value === formData.category) || null}
+                  onChange={(selectedOption) => setFormData(prev => ({ ...prev, category: selectedOption ? selectedOption.value : '' }))}
+                  isClearable
+                  isSearchable
+                  placeholder="Select or type..."
+                  className="text-sm"
+                  styles={{
+                    control: (base) => ({
+                      ...base,
+                      borderColor: '#e2e8f0',
+                      borderRadius: '0.5rem',
+                      padding: '1px',
+                      boxShadow: 'none',
+                      '&:hover': {
+                        borderColor: '#94a3b8'
+                      }
+                    })
+                  }}
+                />
               </div>
               <div>
                 <label className="block text-xs font-medium mb-1 text-slate-600">Training Address</label>
@@ -162,7 +259,7 @@ export default function NporsTab() {
           </div>
 
           <div className="mt-8 flex justify-end border-t border-slate-200 pt-6">
-            <button type="submit" className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-slate-900 font-medium rounded-lg transition-colors">
+            <button type="submit" className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
               Add NPORS Record
             </button>
           </div>
@@ -186,7 +283,7 @@ export default function NporsTab() {
               <th className="px-6 py-3 font-medium">PW Uploaded</th>
               <th className="px-6 py-3 font-medium">Training Address</th>
               <th className="px-6 py-3 font-medium">Cards Info</th>
-              {user.role === 'Admin' && <th className="px-6 py-3 font-medium text-right">Actions</th>}
+              {['Admin', 'Super_Admin', 'Training manager', 'Training Manager'].includes(user.role) && <th className="px-6 py-3 font-medium text-right">Actions</th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
@@ -205,7 +302,7 @@ export default function NporsTab() {
                 <td className="px-6 py-4 text-slate-600">{n.date_pw_uploaded ? new Date(n.date_pw_uploaded).toLocaleDateString() : '-'}</td>
                 <td className="px-6 py-4 text-slate-600 truncate max-w-[150px]" title={n.training_address}>{n.training_address || '-'}</td>
                 <td className="px-6 py-4 text-slate-600 truncate max-w-[150px]" title={n.cards_posted_info}>{n.cards_posted_info || '-'}</td>
-                {user.role === 'Admin' && (
+                {['Admin', 'Super_Admin', 'Training manager', 'Training Manager'].includes(user.role) && (
                   <td className="px-6 py-4 text-right">
                     <button onClick={() => handleDelete(n.id)} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 p-2 rounded-lg transition-colors">
                       <Trash2 className="w-4 h-4" />

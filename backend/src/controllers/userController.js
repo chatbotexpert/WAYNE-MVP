@@ -126,4 +126,31 @@ const getAllEmployees = async (req, res) => {
   }
 };
 
-module.exports = { addEmployee, getEmployeesByCompany, getAllEmployees };
+const updatePermissions = async (req, res) => {
+  const { id } = req.params;
+  const { can_manage_users, can_manage_billing, can_export_data, can_delete_records, can_manage_permissions } = req.body;
+
+  try {
+    const user = await prisma.user.findUnique({ where: { id } });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const updatedUser = await prisma.user.update({
+      where: { id },
+      data: {
+        permission_flags: {
+          upsert: {
+            create: { can_manage_users, can_manage_billing, can_export_data, can_delete_records, can_manage_permissions },
+            update: { can_manage_users, can_manage_billing, can_export_data, can_delete_records, can_manage_permissions }
+          }
+        }
+      },
+      include: { permission_flags: true }
+    });
+
+    res.json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+module.exports = { addEmployee, getEmployeesByCompany, getAllEmployees, updatePermissions };

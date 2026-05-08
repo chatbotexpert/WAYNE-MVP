@@ -64,7 +64,7 @@ export default function EmployeesTab() {
             </select>
           </div>
         )}
-        <button type="submit" className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-slate-900 font-medium rounded-lg transition-colors">
+        <button type="submit" className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
           Create Employee
         </button>
       </form>

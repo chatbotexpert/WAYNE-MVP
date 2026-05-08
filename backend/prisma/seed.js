@@ -24,7 +24,7 @@ async function main() {
   }
 
   // Seed Admin user
-  const adminEmail = 'admin@wayne.com';
+  const adminEmail = 'admin@pavetraining.com';
   const adminPassword = await bcrypt.hash('admin123', 10);
 
   const admin = await prisma.user.upsert({
@@ -34,7 +34,16 @@ async function main() {
       name: 'Super Admin',
       email: adminEmail,
       password_hash: adminPassword,
-      role: 'Admin',
+      role: 'Super_Admin',
+      permission_flags: {
+        create: {
+          can_manage_users: true,
+          can_manage_billing: true,
+          can_export_data: true,
+          can_delete_records: true,
+          can_manage_permissions: true
+        }
+      }
     },
   });
 

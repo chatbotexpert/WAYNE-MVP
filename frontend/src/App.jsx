@@ -18,6 +18,8 @@ import NrswaTab from './components/NrswaTab';
 import EusrTab from './components/EusrTab';
 import InhouseTab from './components/InhouseTab';
 import NvqTab from './components/NvqTab';
+import PermissionsTab from './components/PermissionsTab';
+import TrainingMatrix from './components/TrainingMatrix';
 
 export default function App() {
   return (
@@ -41,6 +43,8 @@ export default function App() {
             <Route path="eusr" element={<EusrTab />} />
             <Route path="inhouse" element={<InhouseTab />} />
             <Route path="nvq" element={<NvqTab />} />
+            <Route path="permissions" element={<PermissionsTab />} />
+            <Route path="matrix" element={<TrainingMatrix />} />
             <Route index element={<Navigate to="workforces" replace />} />
           </Route>
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

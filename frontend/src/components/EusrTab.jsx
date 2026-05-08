@@ -2,6 +2,15 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { FileText, Trash2, Calendar, HardHat } from 'lucide-react';
+import Select from 'react-select';
+
+const eusrCategoryOptions = [
+  { value: "Eusr National Water Hygiene", label: "Eusr National Water Hygiene" },
+  { value: "Eusr Shea Water", label: "Eusr Shea Water" },
+  { value: "EUSR Shea Power", label: "EUSR Shea Power" },
+  { value: "EUSR Shea Tele", label: "EUSR Shea Tele" },
+  { value: "EUSR Shea Gas", label: "EUSR Shea Gas" }
+];
 
 export default function EusrTab() {
   const { user } = useAuth();
@@ -114,7 +123,27 @@ export default function EusrTab() {
               </div>
               <div>
                 <label className="block text-xs font-medium mb-1 text-slate-600">EUSR Category</label>
-                <input type="text" name="category" value={formData.category} onChange={handleChange} placeholder="e.g. SHEA Power" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-900 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
+                <Select
+                  options={eusrCategoryOptions}
+                  value={eusrCategoryOptions.find(c => c.value === formData.category) || null}
+                  onChange={(selectedOption) => setFormData(prev => ({ ...prev, category: selectedOption ? selectedOption.value : '' }))}
+                  isClearable
+                  isSearchable
+                  placeholder="Select or type..."
+                  className="text-sm"
+                  styles={{
+                    control: (base) => ({
+                      ...base,
+                      borderColor: '#e2e8f0',
+                      borderRadius: '0.5rem',
+                      padding: '1px',
+                      boxShadow: 'none',
+                      '&:hover': {
+                        borderColor: '#94a3b8'
+                      }
+                    })
+                  }}
+                />
               </div>
             </div>
 
@@ -149,7 +178,7 @@ export default function EusrTab() {
           </div>
 
           <div className="mt-8 flex justify-end border-t border-slate-200 pt-6">
-            <button type="submit" className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-slate-900 font-medium rounded-lg transition-colors">
+            <button type="submit" className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
               Add EUSR Record
             </button>
           </div>
@@ -171,7 +200,7 @@ export default function EusrTab() {
               <th className="px-6 py-3 font-medium">Card Type</th>
               <th className="px-6 py-3 font-medium">Date Posted</th>
               <th className="px-6 py-3 font-medium">Notes</th>
-              {user.role === 'Admin' && <th className="px-6 py-3 font-medium text-right">Actions</th>}
+              {['Admin', 'Super_Admin'].includes(user.role) && <th className="px-6 py-3 font-medium text-right">Actions</th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
@@ -188,7 +217,7 @@ export default function EusrTab() {
                 <td className="px-6 py-4 text-slate-600">{e.card_type || '-'}</td>
                 <td className="px-6 py-4 text-slate-600">{e.dates_card_posted ? new Date(e.dates_card_posted).toLocaleDateString() : '-'}</td>
                 <td className="px-6 py-4 text-slate-600 truncate max-w-[150px]" title={e.notes}>{e.notes || '-'}</td>
-                {user.role === 'Admin' && (
+                {['Admin', 'Super_Admin'].includes(user.role) && (
                   <td className="px-6 py-4 text-right">
                     <button onClick={() => handleDelete(e.id)} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 p-2 rounded-lg transition-colors">
                       <Trash2 className="w-4 h-4" />

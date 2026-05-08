@@ -2,6 +2,26 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { FileText, Trash2, Calendar, HardHat } from 'lucide-react';
+import Select from 'react-select';
+
+const nrswaCategoryOptions = [
+  { value: "LA", label: "LA" },
+  { value: "01", label: "01" },
+  { value: "02", label: "02" },
+  { value: "03", label: "03" },
+  { value: "04", label: "04" },
+  { value: "05", label: "05" },
+  { value: "06", label: "06" },
+  { value: "07", label: "07" },
+  { value: "08", label: "08" },
+  { value: "S1", label: "S1" },
+  { value: "S2", label: "S2" },
+  { value: "S3", label: "S3" },
+  { value: "S4", label: "S4" },
+  { value: "S5", label: "S5" },
+  { value: "S6", label: "S6" },
+  { value: "S7", label: "S7" }
+];
 
 export default function NrswaTab() {
   const { user } = useAuth();
@@ -43,7 +63,8 @@ export default function NrswaTab() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (user.role === 'Supervisor') return;
+    const hasWriteAccess = ['Admin', 'Super_Admin', 'Training manager', 'Training Manager'].includes(user.role);
+    if (!hasWriteAccess) return;
     try {
       const payload = {
         ...formData,
@@ -77,7 +98,7 @@ export default function NrswaTab() {
     <div className="pb-10">
       <h2 className="text-2xl font-bold text-slate-900 mb-6">NRSWA (Streetworks) Tracker</h2>
 
-      {user.role !== 'Supervisor' && (
+      {['Admin', 'Super_Admin', 'Training manager', 'Training Manager'].includes(user.role) && (
         <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl border border-slate-200 mb-8 max-w-5xl">
           
           <div className="mb-8 p-4 bg-slate-50 border border-slate-200 rounded-lg">
@@ -119,7 +140,27 @@ export default function NrswaTab() {
               </div>
               <div>
                 <label className="block text-xs font-medium mb-1 text-slate-600">Streetworks Category</label>
-                <input type="text" name="category" value={formData.category} onChange={handleChange} placeholder="e.g. O1, S1" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-900 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
+                <Select
+                  options={nrswaCategoryOptions}
+                  value={nrswaCategoryOptions.find(c => c.value === formData.category) || null}
+                  onChange={(selectedOption) => setFormData(prev => ({ ...prev, category: selectedOption ? selectedOption.value : '' }))}
+                  isClearable
+                  isSearchable
+                  placeholder="Select or type..."
+                  className="text-sm"
+                  styles={{
+                    control: (base) => ({
+                      ...base,
+                      borderColor: '#e2e8f0',
+                      borderRadius: '0.5rem',
+                      padding: '1px',
+                      boxShadow: 'none',
+                      '&:hover': {
+                        borderColor: '#94a3b8'
+                      }
+                    })
+                  }}
+                />
               </div>
               <div>
                 <label className="block text-xs font-medium mb-1 text-slate-600">Course</label>
@@ -149,7 +190,7 @@ export default function NrswaTab() {
           </div>
 
           <div className="mt-8 flex justify-end border-t border-slate-200 pt-6">
-            <button type="submit" className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-slate-900 font-medium rounded-lg transition-colors">
+            <button type="submit" className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
               Add NRSWA Record
             </button>
           </div>
@@ -170,7 +211,7 @@ export default function NrswaTab() {
               <th className="px-6 py-3 font-medium">Certs Applied?</th>
               <th className="px-6 py-3 font-medium">Sent Date</th>
               <th className="px-6 py-3 font-medium">Sent To</th>
-              {user.role === 'Admin' && <th className="px-6 py-3 font-medium text-right">Actions</th>}
+              {['Admin', 'Super_Admin', 'Training manager', 'Training Manager'].includes(user.role) && <th className="px-6 py-3 font-medium text-right">Actions</th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
@@ -190,7 +231,7 @@ export default function NrswaTab() {
                 </td>
                 <td className="px-6 py-4 text-slate-600">{n.certs_sent_date ? new Date(n.certs_sent_date).toLocaleDateString() : '-'}</td>
                 <td className="px-6 py-4 text-slate-600 truncate max-w-[150px]" title={n.certs_sent_to}>{n.certs_sent_to || '-'}</td>
-                {user.role === 'Admin' && (
+                {['Admin', 'Super_Admin', 'Training manager', 'Training Manager'].includes(user.role) && (
                   <td className="px-6 py-4 text-right">
                     <button onClick={() => handleDelete(n.id)} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 p-2 rounded-lg transition-colors">
                       <Trash2 className="w-4 h-4" />

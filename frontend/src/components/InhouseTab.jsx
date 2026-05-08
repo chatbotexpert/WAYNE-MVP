@@ -2,6 +2,82 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { FileText, Trash2, Calendar, HardHat } from 'lucide-react';
+import Select from 'react-select';
+
+const inhouseCategoryOptions = [
+  { value: "Pay Welder", label: "Pay Welder" },
+  { value: "Agricultural Tractor", label: "Agricultural Tractor" },
+  { value: "Quick Hitch Awareness", label: "Quick Hitch Awareness" },
+  { value: "Road Roller", label: "Road Roller" },
+  { value: "Road Planer", label: "Road Planer" },
+  { value: "Road Sweeper", label: "Road Sweeper" },
+  { value: "Paver", label: "Paver" },
+  { value: "Chipper", label: "Chipper" },
+  { value: "Winching & Recovery", label: "Winching & Recovery" },
+  { value: "Gritter/Snowplough", label: "Gritter/Snowplough" },
+  { value: "Excavation Marshal - Banksperson", label: "Excavation Marshal - Banksperson" },
+  { value: "Refuse Collection Vehicle", label: "Refuse Collection Vehicle" },
+  { value: "Plant Loader & Securer", label: "Plant Loader & Securer" },
+  { value: "Tow Tractor", label: "Tow Tractor" },
+  { value: "Skip Loader", label: "Skip Loader" },
+  { value: "Multi Lift & Drop - Hook Loader Vehicle", label: "Multi Lift & Drop - Hook Loader Vehicle" },
+  { value: "Shunter Vehicle", label: "Shunter Vehicle" },
+  { value: "4 x 4 Off Road Vehicle", label: "4 x 4 Off Road Vehicle" },
+  { value: "All-Terrain Vehicle", label: "All-Terrain Vehicle" },
+  { value: "Safe Use of Mobile Loading Ramps", label: "Safe Use of Mobile Loading Ramps" },
+  { value: "Abrasive Wheels - Hand Held Cut off Saw", label: "Abrasive Wheels - Hand Held Cut off Saw" },
+  { value: "Concrete Cutting Chainsaw", label: "Concrete Cutting Chainsaw" },
+  { value: "Abrasive Wheels Awareness", label: "Abrasive Wheels Awareness" },
+  { value: "Abrasive Wheels with Practical Cutting/Grinding", label: "Abrasive Wheels with Practical Cutting/Grinding" },
+  { value: "Bench Saw", label: "Bench Saw" },
+  { value: "Circular Saw", label: "Circular Saw" },
+  { value: "Cable Avoidance Tool", label: "Cable Avoidance Tool" },
+  { value: "Chainsaw - Maintenance and Cross Cutting", label: "Chainsaw - Maintenance and Cross Cutting" },
+  { value: "Wood Chipper/Shredder", label: "Wood Chipper/Shredder" },
+  { value: "Grass Cutters/Mowers", label: "Grass Cutters/Mowers" },
+  { value: "Strimmer/Brushcutter", label: "Strimmer/Brushcutter" },
+  { value: "Stump Grinder", label: "Stump Grinder" },
+  { value: "Hand Held Hedge Trimmer", label: "Hand Held Hedge Trimmer" },
+  { value: "Cartridge Tools", label: "Cartridge Tools" },
+  { value: "Powered Handheld Breaker", label: "Powered Handheld Breaker" },
+  { value: "Puller winch", label: "Puller winch" },
+  { value: "High Pressure Water Jetting", label: "High Pressure Water Jetting" },
+  { value: "Shoring (Install, Inspect, Remove)", label: "Shoring (Install, Inspect, Remove)" },
+  { value: "3D GPS Machine Control System", label: "3D GPS Machine Control System" },
+  { value: "Soil Displacement Hammer", label: "Soil Displacement Hammer" },
+  { value: "Piling Rig Attendant", label: "Piling Rig Attendant" },
+  { value: "Roll Crusher - Packer", label: "Roll Crusher - Packer" },
+  { value: "Horizontal Directional Drilling Rig", label: "Horizontal Directional Drilling Rig" },
+  { value: "Crusher", label: "Crusher" },
+  { value: "Screener", label: "Screener" },
+  { value: "Concrete Pump (Mobile)", label: "Concrete Pump (Mobile)" },
+  { value: "Piling Rig", label: "Piling Rig" },
+  { value: "Static Concrete Placing Boom", label: "Static Concrete Placing Boom" },
+  { value: "Soil Stabiliser", label: "Soil Stabiliser" },
+  { value: "Post Rammer", label: "Post Rammer" },
+  { value: "Asbestos Awareness", label: "Asbestos Awareness" },
+  { value: "Plant Supervisor Awareness", label: "Plant Supervisor Awareness" },
+  { value: "MEWP Supervisor Awareness", label: "MEWP Supervisor Awareness" },
+  { value: "FLT Supervisor Awareness", label: "FLT Supervisor Awareness" },
+  { value: "Plant Mover - Non Operational Duties", label: "Plant Mover - Non Operational Duties" },
+  { value: "Plant Machinery Marshal", label: "Plant Machinery Marshal" },
+  { value: "Vehicle Marshal", label: "Vehicle Marshal" },
+  { value: "Safe Working at Height", label: "Safe Working at Height" },
+  { value: "Confined Spaces-Low Risk", label: "Confined Spaces-Low Risk" },
+  { value: "Confined Spaces-Medium Risk", label: "Confined Spaces-Medium Risk" },
+  { value: "Confined Spaces-High Risk", label: "Confined Spaces-High Risk" },
+  { value: "Fire Warden", label: "Fire Warden" },
+  { value: "Manual Handling", label: "Manual Handling" },
+  { value: "Safe Use of Ladders and Ladders", label: "Safe Use of Ladders and Ladders" },
+  { value: "Safety at Street and Road Works", label: "Safety at Street and Road Works" },
+  { value: "Harness and Fall Arrest", label: "Harness and Fall Arrest" },
+  { value: "Port Safety Passport", label: "Port Safety Passport" },
+  { value: "Site Safety Awareness", label: "Site Safety Awareness" },
+  { value: "Construction Site Safety Supervisor", label: "Construction Site Safety Supervisor" },
+  { value: "Construction Site Safety Manager", label: "Construction Site Safety Manager" },
+  { value: "Construction Site Safety Manager - Refresher", label: "Construction Site Safety Manager - Refresher" },
+  { value: "Construction Site Safety Supervisor - Refresher", label: "Construction Site Safety Supervisor - Refresher" }
+];
 
 export default function InhouseTab() {
   const { user } = useAuth();
@@ -119,7 +195,27 @@ export default function InhouseTab() {
               </div>
               <div>
                 <label className="block text-xs font-medium mb-1 text-slate-600">Certificate Category</label>
-                <input type="text" name="category" value={formData.category} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-900 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
+                <Select
+                  options={inhouseCategoryOptions}
+                  value={inhouseCategoryOptions.find(c => c.value === formData.category) || null}
+                  onChange={(selectedOption) => setFormData(prev => ({ ...prev, category: selectedOption ? selectedOption.value : '' }))}
+                  isClearable
+                  isSearchable
+                  placeholder="Select or type..."
+                  className="text-sm"
+                  styles={{
+                    control: (base) => ({
+                      ...base,
+                      borderColor: '#e2e8f0',
+                      borderRadius: '0.5rem',
+                      padding: '1px',
+                      boxShadow: 'none',
+                      '&:hover': {
+                        borderColor: '#94a3b8'
+                      }
+                    })
+                  }}
+                />
               </div>
             </div>
 
@@ -142,7 +238,7 @@ export default function InhouseTab() {
           </div>
 
           <div className="mt-8 flex justify-end border-t border-slate-200 pt-6">
-            <button type="submit" className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-slate-900 font-medium rounded-lg transition-colors">
+            <button type="submit" className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
               Add Record
             </button>
           </div>
@@ -163,7 +259,7 @@ export default function InhouseTab() {
               <th className="px-6 py-3 font-medium">Sent Date</th>
               <th className="px-6 py-3 font-medium">Sent To</th>
               <th className="px-6 py-3 font-medium">Notes</th>
-              {user.role === 'Admin' && <th className="px-6 py-3 font-medium text-right">Actions</th>}
+              {['Admin', 'Super_Admin'].includes(user.role) && <th className="px-6 py-3 font-medium text-right">Actions</th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
@@ -179,7 +275,7 @@ export default function InhouseTab() {
                 <td className="px-6 py-4 text-slate-600">{i.cert_sent_date ? new Date(i.cert_sent_date).toLocaleDateString() : '-'}</td>
                 <td className="px-6 py-4 text-slate-600 truncate max-w-[150px]" title={i.certs_sent_to}>{i.certs_sent_to || '-'}</td>
                 <td className="px-6 py-4 text-slate-600 truncate max-w-[150px]" title={i.notes}>{i.notes || '-'}</td>
-                {user.role === 'Admin' && (
+                {['Admin', 'Super_Admin'].includes(user.role) && (
                   <td className="px-6 py-4 text-right">
                     <button onClick={() => handleDelete(i.id)} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 p-2 rounded-lg transition-colors">
                       <Trash2 className="w-4 h-4" />

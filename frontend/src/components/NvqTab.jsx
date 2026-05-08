@@ -209,7 +209,7 @@ export default function NvqTab() {
           </div>
 
           <div className="mt-8 flex justify-end border-t border-slate-200 pt-6">
-            <button type="submit" className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-slate-900 font-medium rounded-lg transition-colors">
+            <button type="submit" className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
               Add NVQ Record
             </button>
           </div>
@@ -235,7 +235,7 @@ export default function NvqTab() {
               <th className="px-6 py-3 font-medium">Site Address</th>
               <th className="px-6 py-3 font-medium">Contact</th>
               <th className="px-6 py-3 font-medium">Notes</th>
-              {user.role === 'Admin' && <th className="px-6 py-3 font-medium text-right">Actions</th>}
+              {['Admin', 'Super_Admin'].includes(user.role) && <th className="px-6 py-3 font-medium text-right">Actions</th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
@@ -260,7 +260,7 @@ export default function NvqTab() {
                 <td className="px-6 py-4 text-slate-600 truncate max-w-[150px]" title={n.site_address}>{n.site_address || '-'}</td>
                 <td className="px-6 py-4 text-slate-600">{n.site_contact_info || '-'}</td>
                 <td className="px-6 py-4 text-slate-600 truncate max-w-[150px]" title={n.notes}>{n.notes || '-'}</td>
-                {user.role === 'Admin' && (
+                {['Admin', 'Super_Admin'].includes(user.role) && (
                   <td className="px-6 py-4 text-right">
                     <button onClick={() => handleDelete(n.id)} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 p-2 rounded-lg transition-colors">
                       <Trash2 className="w-4 h-4" />
