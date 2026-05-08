@@ -53,7 +53,8 @@ export default function EusrTab() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (user.role === 'Supervisor') return;
+    const hasWriteAccess = ['Admin', 'Super_Admin', 'Training manager', 'Training Manager'].includes(user.role);
+    if (!hasWriteAccess) return;
     try {
       await api.post('/eusr', formData);
       setFormData({
@@ -83,7 +84,7 @@ export default function EusrTab() {
     <div className="pb-10">
       <h2 className="text-2xl font-bold text-slate-900 mb-6">EUSR Tracker</h2>
 
-      {user.role !== 'Supervisor' && (
+      {['Admin', 'Super_Admin', 'Training manager', 'Training Manager'].includes(user.role) && (
         <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl border border-slate-200 mb-8 max-w-5xl">
           
           <div className="mb-8 p-4 bg-slate-50 border border-slate-200 rounded-lg">
@@ -200,7 +201,7 @@ export default function EusrTab() {
               <th className="px-6 py-3 font-medium">Card Type</th>
               <th className="px-6 py-3 font-medium">Date Posted</th>
               <th className="px-6 py-3 font-medium">Notes</th>
-              {['Admin', 'Super_Admin'].includes(user.role) && <th className="px-6 py-3 font-medium text-right">Actions</th>}
+              {['Admin', 'Super_Admin', 'Training manager', 'Training Manager'].includes(user.role) && <th className="px-6 py-3 font-medium text-right">Actions</th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
@@ -217,7 +218,7 @@ export default function EusrTab() {
                 <td className="px-6 py-4 text-slate-600">{e.card_type || '-'}</td>
                 <td className="px-6 py-4 text-slate-600">{e.dates_card_posted ? new Date(e.dates_card_posted).toLocaleDateString() : '-'}</td>
                 <td className="px-6 py-4 text-slate-600 truncate max-w-[150px]" title={e.notes}>{e.notes || '-'}</td>
-                {['Admin', 'Super_Admin'].includes(user.role) && (
+                {['Admin', 'Super_Admin', 'Training manager', 'Training Manager'].includes(user.role) && (
                   <td className="px-6 py-4 text-right">
                     <button onClick={() => handleDelete(e.id)} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 p-2 rounded-lg transition-colors">
                       <Trash2 className="w-4 h-4" />
