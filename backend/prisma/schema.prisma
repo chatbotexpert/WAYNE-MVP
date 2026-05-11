@@ -45,6 +45,7 @@ model Company {
   max_sup                 Int      @default(0)
   max_departments         Int      @default(0)
   main_contact            String?
+  intake_token            String   @unique @default(uuid())
   deleted_at          DateTime?
   created_at              DateTime @default(now())
 

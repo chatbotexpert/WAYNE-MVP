@@ -21,12 +21,15 @@ import NvqTab from './components/NvqTab';
 import PermissionsTab from './components/PermissionsTab';
 import TrainingMatrix from './components/TrainingMatrix';
 
+import PublicIntake from './pages/PublicIntake';
+
 export default function App() {
   return (
     <AuthProvider>
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/intake/:token" element={<PublicIntake />} />
           <Route 
             path="/dashboard" 
             element={

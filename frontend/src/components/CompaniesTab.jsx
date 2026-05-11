@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
-import { Building2, FileText, Phone, Mail, FileDigit, Briefcase, Trash2 } from 'lucide-react';
+import { Building2, FileText, Phone, Mail, FileDigit, Briefcase, Trash2, Link as LinkIcon } from 'lucide-react';
 
 export default function CompaniesTab() {
   const [formData, setFormData] = useState({
@@ -58,6 +58,13 @@ export default function CompaniesTab() {
       console.error(err);
       alert("Failed to delete company. It may be linked to existing employees or workforces.");
     }
+  };
+
+  const handleCopyLink = (token) => {
+    if (!token) return alert('No intake token available for this company.');
+    const link = `${window.location.origin}/intake/${token}`;
+    navigator.clipboard.writeText(link);
+    alert('Intake link copied to clipboard!');
   };
 
   return (
@@ -191,8 +198,11 @@ export default function CompaniesTab() {
                 <td className="px-6 py-4 text-slate-600">{c.accounts_contact_number || '-'}</td>
                 <td className="px-6 py-4 text-slate-600">{c.accounts_email || '-'}</td>
                 <td className="px-6 py-4 text-slate-600">{c.notes_prices_agreed || '-'}</td>
-                <td className="px-6 py-4 text-right">
-                  <button onClick={() => handleDelete(c.id)} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 p-2 rounded-lg transition-colors">
+                <td className="px-6 py-4 text-right flex justify-end space-x-2">
+                  <button onClick={() => handleCopyLink(c.intake_token)} title="Copy Intake Link" className="text-blue-500 hover:text-blue-600 hover:bg-blue-50 p-2 rounded-lg transition-colors">
+                    <LinkIcon className="w-4 h-4" />
+                  </button>
+                  <button onClick={() => handleDelete(c.id)} title="Delete Company" className="text-red-400 hover:text-red-300 hover:bg-red-400/10 p-2 rounded-lg transition-colors">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </td>
